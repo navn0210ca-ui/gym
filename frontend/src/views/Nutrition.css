@@ -1,0 +1,59 @@
+.nutrition-page{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+.nutrition-page>.card{margin-bottom:12px}
+.nutrition-page .nutrition-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.nutrition-page .nutrition-field>span{font-size:var(--fs-footnote);color:var(--label-2)}
+.nutrition-page .nutrition-field input,.nutrition-page .nutrition-field select{width:100%;min-height:44px;padding:9px 11px;border:1px solid var(--sep);border-radius:var(--r-sm);background:var(--surface-2);color:var(--label)}
+.nutrition-page .nutrition-field input:focus,.nutrition-page .nutrition-field select:focus{outline:2px solid var(--acc);outline-offset:1px}
+.nutrition-date{display:flex;flex-direction:column;gap:3px;max-width:145px;font-size:var(--fs-caption);color:var(--label-2)}
+.nutrition-date input{width:100%;min-height:40px;padding:6px 8px;border:1px solid var(--sep);border-radius:var(--r-sm);background:var(--surface);color:var(--label)}
+.nutrition-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}
+.nutrition-summary-grid>div{display:flex;flex-direction:column;gap:5px;padding:12px 10px;border-radius:var(--r);background:var(--surface-2);min-width:0}
+.nutrition-summary-grid span{font-size:var(--fs-caption);color:var(--label-2)}
+.nutrition-summary-grid strong{font-size:clamp(1rem,4vw,1.35rem);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.nutrition-summary-grid small{font-size:var(--fs-caption);font-weight:400;color:var(--label-2)}
+.nutrition-summary-grid .positive strong{color:var(--green)}
+.nutrition-summary-grid .negative strong{color:var(--orange)}
+.nutrition-macro-row{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:var(--fs-footnote);color:var(--label-2)}
+.nutrition-macro-row b{color:var(--label);margin-inline-start:4px}
+.nutrition-form{display:flex;flex-direction:column;gap:12px}
+.nutrition-form-heading,.nutrition-list-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nutrition-form-heading h3,.nutrition-list-heading h2{margin:0;font-size:var(--fs-callout);font-weight:600}
+.nutrition-ingredient-list{display:flex;flex-direction:column;gap:8px}
+.nutrition-ingredient{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 112px auto;align-items:end;gap:8px;padding:10px;border-radius:var(--r);background:var(--surface-2)}
+.nutrition-ingredient>.nutrition-field:nth-child(2){grid-column:1 / -1}
+.nutrition-ingredient .nutrition-remove{grid-column:3;grid-row:1}
+.nutrition-ingredient .nutrition-grams{grid-column:2;grid-row:1}
+.nutrition-custom{grid-column:1 / -1;width:100%;padding-top:2px}
+.nutrition-custom summary,.nutrition-preview summary,.nutrition-entry-details summary{cursor:pointer;color:var(--acc-ink);font-size:var(--fs-footnote);padding:5px 0}
+.nutrition-custom-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.nutrition-preview{border-top:1px solid var(--sep);padding-top:4px}
+.nutrition-photo-pick input{padding:7px!important;height:auto}
+.nutrition-photo-preview{width:auto;max-width:100%;max-height:220px;align-self:flex-start;border-radius:var(--r);object-fit:cover}
+.nutrition-fields-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.nutrition-goal-form{display:flex;flex-direction:column;gap:12px}
+.nutrition-goal-result{display:flex;flex-direction:column;gap:5px;padding:12px;border-radius:var(--r);background:var(--acc-soft);font-size:var(--fs-footnote)}
+.nutrition-goal-result b{font-size:var(--fs-callout);color:var(--acc-ink)}
+.nutrition-warning{color:var(--orange)}
+.nutrition-disclaimer,.nutrition-note{font-size:var(--fs-caption);line-height:var(--lh-small);color:var(--label-2)}
+.nutrition-disclaimer{margin-top:12px}
+.nutrition-error{padding:9px 11px;border-radius:var(--r-sm);background:color-mix(in srgb,var(--red) 14%,transparent);color:var(--red);font-size:var(--fs-footnote)}
+.nutrition-nutrients{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px 14px;margin-top:8px}
+.nutrition-nutrient{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:7px 0;border-bottom:1px solid var(--sep);font-size:var(--fs-footnote)}
+.nutrition-nutrient>span{color:var(--label-2)}
+.nutrition-nutrient b{white-space:nowrap;font-variant-numeric:tabular-nums}
+.nutrition-nutrient small{color:var(--label-2);font-weight:400}
+.nutrition-nutrients.compact{gap:0 12px}
+.nutrition-entry-list{display:flex;flex-direction:column;gap:8px}
+.nutrition-list-heading{margin:18px 2px 10px}
+.nutrition-list-heading>span{font-size:var(--fs-caption);color:var(--label-2)}
+.nutrition-entry{margin:0}
+.nutrition-entry-main{display:flex;align-items:center;gap:10px;min-width:0}
+.nutrition-entry-photo{width:58px;height:58px;flex:none;border-radius:var(--r-sm);object-fit:cover;background:var(--surface-2)}
+.nutrition-entry-copy{display:flex;flex:1;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere}
+.nutrition-entry-delete{color:var(--red);flex:none}
+.nutrition-entry-details{margin-top:8px}
+.nutrition-device-note{display:flex;align-items:flex-start;gap:9px;margin:14px 4px;color:var(--label-2);font-size:var(--fs-caption);line-height:var(--lh-small)}
+.nutrition-device-note svg{flex:none;margin-top:1px}
+.nutrition-home-card .card-head{margin:0}
+.nutrition-home-card .card-head-sub{font-variant-numeric:tabular-nums}
+@media(max-width:390px){.nutrition-summary-grid{gap:5px}.nutrition-summary-grid>div{padding:10px 7px}.nutrition-fields-row{grid-template-columns:1fr}.nutrition-nutrients{grid-template-columns:1fr}}

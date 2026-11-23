@@ -1,9 +1,0 @@
-{
-  "name": "Daywell — daily health, at your pace",
-  "short_name": "Daywell",
-  "description": "A private meal, movement, and weight-goal tracker.",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f7f8f5",
-  "theme_color": "#17251f"
-}
