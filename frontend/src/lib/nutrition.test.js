@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  activityCalories, averageLoggedDeficit, ingredientNutrients, mealNutrients, nutritionTotalsFor, requiredDailyDeficit,
+  activityCalories, averageLoggedDeficit, ingredientNutrients, mealNutrients, mergeAppleActiveEnergy,
+  nutritionTotalsFor, requiredDailyDeficit,
 } from './nutrition.js'
 
 describe('nutrition calculations', () => {
@@ -29,6 +30,28 @@ describe('nutrition calculations', () => {
     expect(result.kcal).toBeCloseTo(260)
     expect(result.activityKcal).toBe(250)
     expect(result.entries).toHaveLength(2)
+  })
+
+  it('imports daily Apple Health totals into a replaceable activity entry', () => {
+    const S = { nutritionEntries: {} }
+    expect(mergeAppleActiveEnergy(S, [{ d: '2026-01-02', kcal: 421.4 }], 10)).toBe(true)
+    expect(nutritionTotalsFor(S, '2026-01-02').activityKcal).toBe(421)
+    expect(mergeAppleActiveEnergy(S, [{ d: '2026-01-02', kcal: 421.4 }], 20)).toBe(false)
+    expect(mergeAppleActiveEnergy(S, [{ d: '2026-01-02', kcal: 510 }], 30)).toBe(true)
+    expect(nutritionTotalsFor(S, '2026-01-02').activityKcal).toBe(510)
+    expect(Object.keys(S.nutritionEntries)).toHaveLength(1)
+  })
+
+  it('ignores invalid and user-deleted Apple Health totals', () => {
+    const S = { nutritionEntries: {
+      'apple-health-active-energy-2026-01-02': { d: '2026-01-02', kcal: 421, type: 'activity', _deleted: true },
+    } }
+    expect(mergeAppleActiveEnergy(S, [
+      { d: '2026-01-02', kcal: 500 },
+      { d: 'not-a-date', kcal: 100 },
+      { d: '2026-01-03', kcal: -2 },
+    ])).toBe(false)
+    expect(S.nutritionEntries['apple-health-active-energy-2026-01-02']._deleted).toBe(true)
   })
 
   it('estimates activity calories from MET, body weight, and duration', () => {

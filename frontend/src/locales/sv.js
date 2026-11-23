@@ -1,5 +1,9 @@
 // Swedish UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Aktiva kalorier från Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "Aktiva kalorier importeras när openGym öppnas eller återgår till förgrunden. Registrera inte samma klockkalorier manuellt.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Det gick inte att ansluta till Apple Health. Kontrollera behörigheterna i appen Hälsa.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "Webbplatsen kan inte läsa data från Apple Watch eller Hälsa. Aktivera Apple Health i iPhone-appen för att importera dagliga aktiva kalorier.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "Klockor",
   "Set once": "Ställ in en gång",

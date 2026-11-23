@@ -1,5 +1,9 @@
 // Simplified Chinese UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Apple Health 活动热量",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "打开 openGym 或返回前台时会导入活动热量。请勿手动重复记录相同的手表热量。",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "无法连接 Apple Health。请在“健康”App 中检查权限。",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "此网站无法读取 Apple Watch 或“健康”数据。请在 iPhone App 中启用 Apple Health，以导入每日活动热量。",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "手表",
   "Set once": "设置一次",

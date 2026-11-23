@@ -2,6 +2,10 @@
 export const metadata = { description: 'Diario personale di allenamento e peso corporeo' }
 
 export default {
+  "Active calories from Apple Health": "Calorie attive da Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "Importa le calorie attive quando openGym si apre o torna in primo piano. Non inserire manualmente le stesse calorie dell’orologio.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Impossibile connettersi ad Apple Health. Controlla i permessi nell’app Salute.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "Questo sito non può leggere i dati di Apple Watch o Salute. Attiva Apple Health nell’app per iPhone per importare le calorie attive giornaliere.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "Orologi",
   "Set once": "Da impostare una volta",

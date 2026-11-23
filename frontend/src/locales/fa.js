@@ -1,5 +1,9 @@
 // Persian UI strings. Keys are the English source strings.
 export default {
+  "Active calories from Apple Health": "کالری فعال از Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "با بازشدن openGym یا بازگشت آن به پیش‌زمینه، کالری فعال وارد می‌شود. همان کالری ساعت را دستی ثبت نکنید.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "اتصال به Apple Health ممکن نشد. مجوزها را در برنامه Health بررسی کنید.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "این وب‌سایت نمی‌تواند داده‌های Apple Watch یا Health را بخواند. برای واردکردن کالری فعال روزانه، Apple Health را در برنامه iPhone فعال کنید.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "ساعت‌ها",
   "Set once": "یک‌بار تنظیم",

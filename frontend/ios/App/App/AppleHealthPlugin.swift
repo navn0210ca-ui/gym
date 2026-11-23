@@ -39,6 +39,7 @@ public class AppleHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "readBody", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readVitals", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readWorkouts", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "readActiveEnergy", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "allowBirthDate", returnType: CAPPluginReturnPromise),
     ]
 
@@ -96,6 +97,7 @@ public class AppleHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             if read.contains("restingHeartRate"), let rhr = HKObjectType.quantityType(forIdentifier: .restingHeartRate) { types.insert(rhr) }
             if read.contains("hrv"), let hrv = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) { types.insert(hrv) }
             if read.contains("steps"), let steps = HKObjectType.quantityType(forIdentifier: .stepCount) { types.insert(steps) }
+            if read.contains("activeEnergy"), let energy = activeEnergy { types.insert(energy) }
             // Sport (v1.4.5, gm-hooks, lib/activities.js): other apps' workouts, as activities.
             if read.contains("exercise") { types.insert(HKObjectType.workoutType()) }
             var share: Set<HKSampleType> = []
@@ -319,6 +321,54 @@ public class AppleHealthPlugin: CAPPlugin, CAPBridgedPlugin {
             }
             call.resolve(["records": rows])
         } failed: { self.fail(call, $0) }
+    }
+
+    /// Daily active-energy totals from Apple Health, including samples synced from Apple Watch.
+    /// The caller imports these as replaceable daily nutrition entries; HealthKit never grants
+    /// history-wide access separately, so only the requested date range is queried.
+    @objc func readActiveEnergy(_ call: CAPPluginCall) {
+        let fmt = DateFormatter()
+        fmt.calendar = Calendar(identifier: .gregorian)
+        fmt.locale = Locale(identifier: "en_US_POSIX")
+        fmt.timeZone = TimeZone.current
+        fmt.dateFormat = "yyyy-MM-dd"
+        guard let from = call.getString("from"), let day = fmt.date(from: from) else {
+            call.reject("from is needed", "failed")
+            return
+        }
+        guard HKHealthStore.isHealthDataAvailable(), let type = activeEnergy else {
+            call.reject("Apple Health is not available", "unavailable")
+            return
+        }
+        let start = Calendar.current.startOfDay(for: day)
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: nil)
+        Task {
+            let result: Result<[[String: Any]], Error> = await withCheckedContinuation { cont in
+                let query = HKStatisticsCollectionQuery(
+                    quantityType: type,
+                    quantitySamplePredicate: predicate,
+                    options: .cumulativeSum,
+                    anchorDate: start,
+                    intervalComponents: DateComponents(day: 1)
+                )
+                query.initialResultsHandler = { _, results, error in
+                    if let error { cont.resume(returning: .failure(error)); return }
+                    var records: [[String: Any]] = []
+                    results?.enumerateStatistics(from: start, to: Date()) { statistic, _ in
+                        let kcal = statistic.sumQuantity()?.doubleValue(for: .kilocalorie()) ?? 0
+                        if kcal > 0 {
+                            records.append(["d": fmt.string(from: statistic.startDate), "kcal": kcal.rounded()])
+                        }
+                    }
+                    cont.resume(returning: .success(records))
+                }
+                self.store.execute(query)
+            }
+            switch result {
+            case .success(let records): call.resolve(["records": records])
+            case .failure(let error): self.fail(call, error)
+            }
+        }
     }
 
     /// Apple Health's activity types to lib/activities.js SPORTS, plus 'strength', 'gym' (machines,

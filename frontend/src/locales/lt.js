@@ -1,5 +1,9 @@
 // Lithuanian UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Aktyviosios kalorijos iš Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "Aktyviosios kalorijos importuojamos atidarius openGym arba grįžus į programą. Tų pačių laikrodžio kalorijų rankiniu būdu neįrašykite.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Nepavyko prisijungti prie Apple Health. Patikrinkite leidimus programoje „Health“.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "Ši svetainė negali skaityti Apple Watch ar „Health“ duomenų. Įjunkite Apple Health iPhone programėlėje, kad importuotumėte dienos aktyviąsias kalorijas.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "Laikrodžiai",
   "Set once": "Nustatoma kartą",

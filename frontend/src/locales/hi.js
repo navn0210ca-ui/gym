@@ -1,5 +1,9 @@
 // Hindi UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Apple Health से सक्रिय कैलोरी",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "openGym खुलने या फिर सामने आने पर सक्रिय कैलोरी आयात होती है। घड़ी की उन्हीं कैलोरी को हाथ से दर्ज न करें।",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Apple Health से कनेक्ट नहीं हो सका। Health ऐप में अनुमतियाँ जाँचें।",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "यह वेबसाइट Apple Watch या Health का डेटा नहीं पढ़ सकती। रोज़ की सक्रिय कैलोरी आयात करने के लिए iPhone ऐप में Apple Health चालू करें।",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "घड़ियाँ",
   "Set once": "एक बार सेट करें",

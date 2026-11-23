@@ -86,6 +86,30 @@ export function nutritionTotalsFor(S, date) {
   return { ...totals, activityKcal, entries }
 }
 
+export function mergeAppleActiveEnergy(S, records, now = Date.now()) {
+  const entries = S?.nutritionEntries && typeof S.nutritionEntries === 'object' && !Array.isArray(S.nutritionEntries)
+    ? { ...S.nutritionEntries }
+    : {}
+  let changed = false
+  for (const record of Array.isArray(records) ? records : []) {
+    const date = String(record?.d || '')
+    const kcal = Number(record?.kcal)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(kcal) || kcal <= 0 || kcal > 100000) continue
+    const id = `apple-health-active-energy-${date}`
+    const previous = entries[id]
+    if (previous?._deleted === true || (previous?.kcal === Math.round(kcal) && previous?.source === 'apple-health')) continue
+    entries[id] = {
+      id, type: 'activity', activityId: 'watch', d: date,
+      at: new Date(`${date}T12:00:00`).getTime(), minutes: 0,
+      kcal: Math.round(kcal), title: 'Apple Health active energy', source: 'apple-health',
+      _ts: now,
+    }
+    changed = true
+  }
+  if (changed) S.nutritionEntries = entries
+  return changed
+}
+
 export function averageLoggedDeficit(S, baselineKcal, now = new Date(), days = 7) {
   const baseline = Number(baselineKcal)
   if (!Number.isFinite(baseline) || baseline <= 0 || !Number.isInteger(days) || days < 1) return null

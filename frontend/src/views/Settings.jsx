@@ -2221,7 +2221,7 @@ function HealthConnectCard({ S, toast, android, page = false }) {
     } catch { toast(c.failed) }
     setBusy(false)
   }
-  const reading = h.readHr || h.readWeight || h.readBody || h.readVitals || h.readSport
+  const reading = h.readHr || h.readWeight || h.readBody || h.readVitals || h.readSport || h.readCalories
 
   // Off can mean two things for what is already there, so it asks; closing the sheet keeps it on.
   const askOff = () => menuSheet({
@@ -2272,6 +2272,10 @@ function HealthConnectCard({ S, toast, android, page = false }) {
         subtitle={t('Strava, your watch, Runna and friends: their sessions show in your calendar and tire the right muscles. No sets, no volume.')}>
         <Switch checked={!!h.readSport} disabled={busy} onChange={toggleRead('sport')} />
       </Row>
+      {ios && <Row icon="flame" iconTint="var(--orange)" title={t('Active calories from Apple Health')}
+        subtitle={t("Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.")}>
+        <Switch checked={!!h.readCalories} disabled={busy} onChange={toggleRead('calories')} />
+      </Row>}
       {/* The Apple Watch's Zones page: max heart rate from the age, a watch setting (show.zones).
           On asks Apple Health (the watch app shares this app's permissions), or opens it once answered. */}
       {ios && isOn(S, 'watch') && <Row icon="heart" iconTint="var(--orange)" title={t('Birth date, for heart-rate zones')}
@@ -2283,7 +2287,7 @@ function HealthConnectCard({ S, toast, android, page = false }) {
       </Row>}
       {reading && h.readError === 'permission' && <Row icon="warning" iconTint="var(--orange)"
         title={t('Permission withdrawn. Tap to allow again')} accessory="chevron"
-        onClick={() => toggleRead(h.readHr ? 'hr' : h.readWeight ? 'weight' : h.readBody ? 'body' : h.readVitals ? 'vitals' : 'sport')(true)} />}
+        onClick={() => toggleRead(h.readHr ? 'hr' : h.readWeight ? 'weight' : h.readBody ? 'body' : h.readVitals ? 'vitals' : h.readSport ? 'sport' : 'calories')(true)} />}
       {(h.on || reading) && <Row icon="list" iconTint="var(--blue)" title={c.open}
         accessory="chevron" onClick={() => openHealthConnect().catch(() => {})} />}
     </Section>

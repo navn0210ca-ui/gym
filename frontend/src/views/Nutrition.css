@@ -13,6 +13,9 @@
 .nutrition-summary-grid small{font-size:var(--fs-caption);font-weight:400;color:var(--label-2)}
 .nutrition-summary-grid .positive strong{color:var(--green)}
 .nutrition-summary-grid .negative strong{color:var(--orange)}
+.nutrition-health{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nutrition-health b{font-size:var(--fs-callout)}
+.nutrition-health p{margin:5px 0 0;color:var(--label-2);font-size:var(--fs-caption);line-height:var(--lh-small)}
 .nutrition-macro-row{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:var(--fs-footnote);color:var(--label-2)}
 .nutrition-macro-row b{color:var(--label);margin-inline-start:4px}
 .nutrition-form{display:flex;flex-direction:column;gap:12px}

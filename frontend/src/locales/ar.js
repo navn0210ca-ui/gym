@@ -1,5 +1,9 @@
 // Arabic UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "السعرات النشطة من Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "يستورد السعرات النشطة عند فتح openGym أو عودته إلى الواجهة. لا تُدخل سعرات الساعة نفسها يدويًا.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "تعذر الاتصال بـ Apple Health. تحقق من أذونات الصحة في تطبيق الصحة.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "لا يمكن لهذا الموقع قراءة بيانات Apple Watch أو الصحة. استخدم تطبيق iPhone وفعّل Apple Health لاستيراد السعرات النشطة اليومية.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "الساعات",
   "Set once": "تُضبط مرة واحدة",

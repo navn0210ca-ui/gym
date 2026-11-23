@@ -1,4 +1,8 @@
 export default {
+  "Active calories from Apple Health": "Apple Health 活動熱量",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "openGym 開啟或回到前景時會匯入活動熱量。請勿手動重複記錄相同的手錶熱量。",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "無法連接 Apple Health。請在「健康」App 中檢查權限。",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "此網站無法讀取 Apple Watch 或「健康」資料。請在 iPhone App 中啟用 Apple Health，以匯入每日活動熱量。",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "手錶",
   "Set once": "設定一次",

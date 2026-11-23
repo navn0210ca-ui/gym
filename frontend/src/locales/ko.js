@@ -1,5 +1,9 @@
 // Korean UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Apple Health의 활동 칼로리",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "openGym을 열거나 다시 활성화할 때 활동 칼로리를 가져옵니다. 같은 시계 칼로리를 수동으로 기록하지 마세요.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Apple Health에 연결할 수 없습니다. 건강 앱에서 권한을 확인하세요.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "이 웹사이트에서는 Apple Watch 또는 건강 데이터를 읽을 수 없습니다. 일일 활동 칼로리를 가져오려면 iPhone 앱에서 Apple Health를 활성화하세요.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "워치",
   "Set once": "한 번만 설정",

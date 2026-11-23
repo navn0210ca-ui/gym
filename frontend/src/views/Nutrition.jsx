@@ -2,15 +2,17 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CardHead from '../components/CardHead.jsx'
 import Icon from '../components/Icon.jsx'
-import { Button, NumberField } from '../components/ui.jsx'
+import { Button, NumberField, Switch } from '../components/ui.jsx'
 import { fmtDate, fmtNum, todayISO } from '../lib/format.js'
 import { t } from '../lib/i18n.js'
 import { lastBW } from '../lib/history.js'
+import { MOBILE } from '../lib/mobile.js'
 import {
   ACTIVITY_PRESETS, FOOD_PRESETS, NUTRIENTS, activityCalories, mealNutrients,
   averageLoggedDeficit, nutritionEntriesOn, nutritionTotalsFor, requiredDailyDeficit,
 } from '../lib/nutrition.js'
 import { compressNutritionPhoto, loadNutritionPhoto, removeNutritionPhoto, saveNutritionPhoto } from '../lib/nutrition-photos.js'
+import { disableRead, enableRead, healthStatus, loadHealth, onHealthChange } from '../lib/health-sync.js'
 import { useStore } from '../store/useStore.js'
 import './Nutrition.css'
 
@@ -246,6 +248,8 @@ export default function Nutrition() {
   const [goalError, setGoalError] = useState('')
   const [photoUrls, setPhotoUrls] = useState({})
   const [pageError, setPageError] = useState('')
+  const [appleHealth, setAppleHealth] = useState(null)
+  const [healthBusy, setHealthBusy] = useState(false)
   const totals = useMemo(() => nutritionTotalsFor(S, selectedDate), [S, selectedDate])
   const entries = useMemo(() => nutritionEntriesOn(S, selectedDate), [S.nutritionEntries, selectedDate])
   const currentWeight = lastBW(S)?.w
@@ -283,6 +287,41 @@ export default function Nutrition() {
       for (const url of urls) URL.revokeObjectURL(url)
     }
   }, [entries])
+
+  useEffect(() => {
+    let active = true
+    const updateHealth = health => {
+      if (active) setAppleHealth({ platform: 'ios', available: true, enabled: !!health?.readCalories })
+    }
+    Promise.all([healthStatus(), loadHealth()]).then(([status, health]) => {
+      if (active && status.platform === 'ios') {
+        setAppleHealth({ platform: 'ios', available: status.status === 'available', enabled: !!health.readCalories })
+      }
+    }).catch(reason => {
+      if (active) setPageError(reason instanceof Error ? reason.message : t('Could not connect to Apple Health. Check Health permissions in the Health app.'))
+    })
+    const off = onHealthChange(updateHealth)
+    return () => { active = false; off() }
+  }, [])
+
+  const toggleAppleHealth = async enabled => {
+    setPageError('')
+    setHealthBusy(true)
+    try {
+      if (enabled) {
+        const result = await enableRead('calories', () => useStore.getState().S)
+        setAppleHealth(current => current ? { ...current, enabled: !!result.health?.readCalories } : current)
+        if (!result.ok) setPageError(t('Could not connect to Apple Health. Check Health permissions in the Health app.'))
+      } else {
+        const health = await disableRead('calories')
+        setAppleHealth(current => current ? { ...current, enabled: !!health.readCalories } : current)
+      }
+    } catch (reason) {
+      setPageError(reason instanceof Error ? reason.message : t('Could not connect to Apple Health. Check Health permissions in the Health app.'))
+    } finally {
+      setHealthBusy(false)
+    }
+  }
 
   const saveGoal = event => {
     event.preventDefault()
@@ -352,6 +391,15 @@ export default function Nutrition() {
       </div>
     </section>
 
+    {appleHealth?.platform === 'ios' && appleHealth.available && <section className="card nutrition-health">
+      <div>
+        <b>{t('Active calories from Apple Health')}</b>
+        <p>{t("Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.")}</p>
+      </div>
+      <Switch aria-label={t('Active calories from Apple Health')} checked={appleHealth.enabled}
+        disabled={healthBusy} onChange={toggleAppleHealth} />
+    </section>}
+
     <section className="card">
       <CardHead icon="scale" tint="var(--teal)" title={t('Weight goal & calorie target')}
         sub={t('Set an estimated baseline burn and a target date to calculate the daily deficit needed.')} />
@@ -412,14 +460,16 @@ export default function Nutrition() {
           <div className="nutrition-entry-main">
             {photoUrls[entry.id] && <img className="nutrition-entry-photo" src={photoUrls[entry.id]} alt={t('Meal photo')} />}
             <div className="nutrition-entry-copy">
-              <b>{entry.name || entry.title}</b>
+              <b>{entry.source === 'apple-health' ? t('Apple Health') : entry.name || entry.title}</b>
               <span className="muted small">{isMeal
                 ? (entry.ingredients || []).map(item => `${item.name} ${showValue(item.grams)} g`).join(' · ')
-                : `${showValue(entry.minutes)} min · ${showValue(entry.kcal)} kcal`}</span>
+                  : entry.source === 'apple-health'
+                    ? `${t('Apple Health')} · ${showValue(entry.kcal)} kcal`
+                    : `${showValue(entry.minutes)} min · ${showValue(entry.kcal)} kcal`}</span>
               {isMeal && <span className="small">{showValue(nutrients.kcal)} kcal · {t('Protein')} {showValue(nutrients.protein)} g</span>}
             </div>
             <button type="button" className="iconbtn nutrition-entry-delete" onClick={() => removeEntry(entry)}
-              aria-label={t('Delete {0}', entry.name || entry.title)}><Icon name="trash" /></button>
+              aria-label={t('Delete {0}', entry.source === 'apple-health' ? t('Apple Health') : entry.name || entry.title)}><Icon name="trash" /></button>
           </div>
           {isMeal && <details className="nutrition-entry-details">
             <summary>{t('View nutrients')}</summary>
@@ -428,9 +478,9 @@ export default function Nutrition() {
         </article>
       })}</div>}
 
-    <div className="nutrition-device-note">
+    {(!MOBILE || appleHealth?.platform === 'android') && <div className="nutrition-device-note">
       <Icon name="info" />
-      <span>{t('This GitHub Pages demo stores nutrition entries in this browser. Meal photos stay on this device. The native iPhone app has its existing Apple Health integration, but this nutrition journal does not automatically import active calories. A website cannot directly access Apple Watch or HealthKit, so enter watch calories above.')}</span>
-    </div>
+      <span>{t('This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.')}</span>
+    </div>}
   </div>
 }

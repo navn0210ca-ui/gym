@@ -23,9 +23,13 @@ database.
 The GitHub Pages build is a static, local demo. Nutrition entries and goals are saved in the
 openGym profile in that browser; meal photos are saved in that browser's IndexedDB. They do not
 sync between browsers in the Pages demo, and clearing browser site data removes them. The public
-site cannot access HealthKit or Apple Watch directly. The native iPhone app has openGym's existing
-Apple Health integration for its supported workout and body data, but this nutrition journal does
-not automatically import active calories. Enter calories shown by a watch or tracker manually.
+site cannot access HealthKit or Apple Watch directly. In the native iPhone app, enable **Active
+calories from Apple Health** in the nutrition journal or Settings → Integrations → Apple Health.
+Allow access to **Active Energy** when iOS asks. openGym imports one daily total into the activity
+log when the app opens or returns to the foreground; late-arriving Watch data updates that day's
+entry. This is a foreground refresh, not a continuous background feed. Avoid also logging the same
+Watch calories manually. If Apple Health read access was denied, change it in the Health app's
+sharing settings.
 
 When self-hosting openGym, nutrition records participate in the profile's per-entry sync. Meal
 photos remain in the browser that took them in this version. The original openGym workout, planning,

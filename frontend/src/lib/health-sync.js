@@ -11,14 +11,13 @@
 // the Apple Watch app (its workout session shows the heart rate per set), and tells the watch
 // whether it is on (setEnabled: the App Group's "healthEnabled", which the watch link passes on).
 //
-// Since v1.4.3 it can also read two things back (#544, #127), each behind a switch of its own and
-// off by default: the heart rate during a finished workout (for any watch that saves to the hub,
-// not just the Apple Watch), and weigh-ins other apps saved there. Only while the app is open, only
-// the workouts of the last day and the weigh-ins since the last read (30 days the first time), so
-// no background or history permission is asked for. What it decides is in lib/health-read.js.
+// It can also read data back (#544, #127), each behind its own switch and off by default: heart rate
+// during a finished workout, weigh-ins, and (on iPhone) daily Apple Watch active energy for
+// Nutrition. Reads happen while the app is open; no background or history permission is requested.
+// What it decides is in lib/health-read.js.
 //
 // The web build never gets here (MOBILE is a build-time flag).
-import { mergeHeartRate, mergeWeighIns, lacksHeartRate, mergeBodyComp } from './health-read.js'
+import { mergeHeartRate, mergeWeighIns, lacksHeartRate, mergeBodyComp, mergeAppleActiveEnergy } from './health-read.js'
 import { mergeVitals } from './vitals.js'
 import { mergeHealthActivities } from './activities.js'
 import { isoOf } from './format.js'
@@ -32,7 +31,7 @@ import { speedUnitOf } from './speed.js'
 export const HEALTH_FILE = 'opengym-health.json'
 // How many ids of records the store refused are remembered (syncOnce, `refused`).
 export const REFUSED_MAX = 50
-const OFF = { on: false, kcalAsked: false, written: {}, at: 0, error: null, readHr: false, readWeight: false, wHistory: false, wCursor: 0, seen: {}, hrTried: {}, readError: null, readBody: false, body: {}, bCursor: 0, readVitals: false, vitals: {}, readSport: false, sCursor: 0 }
+const OFF = { on: false, kcalAsked: false, written: {}, at: 0, error: null, readHr: false, readWeight: false, wHistory: false, wCursor: 0, seen: {}, hrTried: {}, readError: null, readBody: false, body: {}, bCursor: 0, readVitals: false, vitals: {}, readSport: false, sCursor: 0, readCalories: false }
 
 // Wrapped in an object, as in rest-alert.js: a Capacitor plugin proxy answers `then`, so a
 // promise resolved with the bare proxy never settles.
@@ -283,6 +282,7 @@ let lastWeightRead = 0
 let lastBodyRead = 0
 let lastVitalsRead = 0
 let lastSportRead = 0
+let lastCaloriesRead = 0
 
 // The hub's names for what the body-composition switch reads; Apple Health has the first two.
 export const BODY_READS = ['bodyFat', 'leanMass', 'boneMass', 'bodyWater', 'bmr']
@@ -292,22 +292,23 @@ export const VITAL_READS = ['sleep', 'restingHeartRate', 'hrv', 'steps']
 // Sport (v1.4.5, gm-hooks, lib/activities.js): other apps' workouts (a run from Strava or the watch,
 // a padel match) as activities. One permission: the store's exercise sessions / workouts.
 export const SPORT_READS = ['exercise']
-const readKey = kind => (kind === 'hr' ? 'readHr' : kind === 'body' ? 'readBody' : kind === 'vitals' ? 'readVitals' : kind === 'sport' ? 'readSport' : 'readWeight')
-const anyRead = h => !!(h && (h.readHr || h.readWeight || h.readBody || h.readVitals || h.readSport))
+const readKey = kind => (kind === 'hr' ? 'readHr' : kind === 'body' ? 'readBody' : kind === 'vitals' ? 'readVitals' : kind === 'sport' ? 'readSport' : kind === 'calories' ? 'readCalories' : 'readWeight')
+const anyRead = h => !!(h && (h.readHr || h.readWeight || h.readBody || h.readVitals || h.readSport || h.readCalories))
 
 /**
- * Turns one of the reads on (`kind`: 'hr' | 'weight' | 'body' | 'vitals' | 'sport'): asks for that read permission
+ * Turns one of the reads on (`kind`: 'hr' | 'weight' | 'body' | 'vitals' | 'sport' | 'calories'): asks for that read permission
  * only, then reads once. Resolves with { ok, reason }; reason 'denied' when it was not granted.
  */
 export async function enableRead(kind, getState, { apply = null } = {}) {
   const p = await plugin()
   if (!p) return { ok: false, reason: 'unsupported' }
+  if (kind === 'calories' && p.platform !== 'ios') return { ok: false, reason: 'unsupported' }
   const st = await p.HC.status().catch(() => ({ status: 'unsupported' }))
   if (st.status !== 'available') return { ok: false, reason: st.status }
   const perm = kind === 'hr' ? 'heartRate' : kind === 'body' ? 'body' : kind === 'vitals' ? 'vitals' : kind === 'sport' ? 'exercise' : 'weight'
   // The history permission only where Health Connect has it (status says so); Apple Health has none.
   const history = kind === 'weight' && p.platform !== 'ios' && st.history === true
-  const read = kind === 'body' ? BODY_READS : kind === 'vitals' ? VITAL_READS : kind === 'sport' ? SPORT_READS : history ? [perm, 'history'] : [perm]
+  const read = kind === 'body' ? BODY_READS : kind === 'vitals' ? VITAL_READS : kind === 'sport' ? SPORT_READS : kind === 'calories' ? ['activeEnergy'] : history ? [perm, 'history'] : [perm]
   const res = await p.HC.requestPermissions({ read, write: [] }).catch(() => null)
   // Apple Health never says whether reading was allowed (that it was refused is itself private):
   // `read` is then missing, and a refusal just reads nothing. Body composition: any one of them.
@@ -335,7 +336,7 @@ export async function disableRead(kind) {
 
 /**
  * One read pass: the heart rate of every workout finished in the last day that still lacks some,
- * and the weigh-ins since the last read. A no-op while both switches are off; never runs twice at
+ * weigh-ins, daily active energy, and other enabled reads. A no-op while all switches are off; never runs twice at
  * once; reads the same thing at most every ten minutes (two after coming back to the foreground,
  * `force`). The log changes only when something new came in.
  */
@@ -420,6 +421,18 @@ async function readOnce(getState, force, now, applyFn) {
       if (body) h.body = body
       const newest = records.reduce((m, r) => Math.max(m, Number(r?.t) || 0), 0)
       if (newest > h.bCursor) h.bCursor = newest
+    } catch (e) { if (!error) fail(e) }
+  }
+
+  // Apple Watch active energy is read as one daily total; querying two prior days again allows
+  // late-arriving Watch samples to update the same nutrition entry rather than creating duplicates.
+  if (h.readCalories && p.platform === 'ios' && (force ? now - lastCaloriesRead >= RESUME_EVERY_MS : now - lastCaloriesRead >= READ_EVERY_MS)) {
+    try {
+      const from = isoOf(new Date(now - 2 * 24 * 3600e3))
+      const res = await p.HC.readActiveEnergy({ from })
+      lastCaloriesRead = now
+      const records = Array.isArray(res?.records) ? res.records : []
+      if (records.length) apply(probe => mergeAppleActiveEnergy(probe, records, now), s => { mergeAppleActiveEnergy(s, records, now) })
     } catch (e) { if (!error) fail(e) }
   }
 

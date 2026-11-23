@@ -1,5 +1,9 @@
 // Indonesian UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Kalori aktif dari Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "Kalori aktif diimpor saat openGym dibuka atau kembali ke latar depan. Jangan masukkan kalori jam yang sama secara manual.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Tidak dapat terhubung ke Apple Health. Periksa izin di aplikasi Kesehatan.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "Situs ini tidak dapat membaca data Apple Watch atau Kesehatan. Aktifkan Apple Health di aplikasi iPhone untuk mengimpor kalori aktif harian.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "Jam tangan",
   "Set once": "Atur sekali",

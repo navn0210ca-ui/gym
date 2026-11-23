@@ -1,5 +1,9 @@
 // Vietnamese UI strings. Generated for openGym.
 export default {
+  "Active calories from Apple Health": "Calo hoạt động từ Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "Nhập calo hoạt động khi mở openGym hoặc quay lại ứng dụng. Đừng nhập thủ công lượng calo trùng từ đồng hồ.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Không thể kết nối Apple Health. Hãy kiểm tra quyền trong ứng dụng Sức khỏe.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "Trang web này không thể đọc dữ liệu Apple Watch hoặc Sức khỏe. Hãy bật Apple Health trong ứng dụng iPhone để nhập calo hoạt động hằng ngày.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "Đồng hồ",
   "Set once": "Đặt một lần",

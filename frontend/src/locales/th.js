@@ -1,5 +1,9 @@
 // Thai UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "แคลอรีที่ใช้จาก Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "นำเข้าแคลอรีที่ใช้เมื่อเปิด openGym หรือกลับมาที่แอป อย่าบันทึกแคลอรีจากนาฬิกาซ้ำด้วยตนเอง",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "เชื่อมต่อ Apple Health ไม่ได้ โปรดตรวจสอบสิทธิ์ในแอปสุขภาพ",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "เว็บไซต์นี้อ่านข้อมูลจาก Apple Watch หรือสุขภาพไม่ได้ โปรดเปิดใช้ Apple Health ในแอป iPhone เพื่อนำเข้าแคลอรีที่ใช้ในแต่ละวัน",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "นาฬิกา",
   "Set once": "ตั้งครั้งเดียว",

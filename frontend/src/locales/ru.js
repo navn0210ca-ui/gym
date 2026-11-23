@@ -1,5 +1,9 @@
 // Russian UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Активные калории из Apple Health",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "Активные калории импортируются при открытии openGym или возвращении приложения на экран. Не вводите вручную те же калории с часов.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Не удалось подключиться к Apple Health. Проверьте разрешения в приложении «Здоровье».",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "Этот сайт не может читать данные Apple Watch или приложения «Здоровье». Включите Apple Health в приложении для iPhone, чтобы импортировать дневные активные калории.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "Часы",
   "Set once": "Настраивается один раз",

@@ -1,9 +1,10 @@
 // What openGym takes back from the phone's health hub (#544, #127): Health Connect on Android,
-// Apple Health on the iPhone. Two things, each behind its own switch in Settings:
+// Apple Health on the iPhone. Each read is opt-in:
 //
 //   - the heart rate during a finished workout, per set and for the session (lib/heart-rate.js
 //     works out which samples belong to which set), for every watch that saves to the hub;
 //   - weigh-ins other apps saved there (a smart scale's, Garmin's, Withings', Samsung's...).
+//   - Apple Health's daily active-energy total, into the nutrition activity log on iPhone.
 //
 // Pure: lib/health-sync.js reads the hub and hands the records over; this decides what goes into
 // the log. The rules:
@@ -17,6 +18,9 @@ import { hrFromSamples, sanitizeHr } from './heart-rate.js'
 import { stampWorkout } from './sync-merge.js'
 import { isoOf } from './format.js'
 import { addWeighIn, readingsOf, timeOf, hashId } from './weigh-ins.js'
+import { mergeAppleActiveEnergy } from './nutrition.js'
+
+export { mergeAppleActiveEnergy }
 
 export const LB_PER_KG = 2.2046226218
 // Weigh-ins outside this are a typo or another person's profile in the hub, not a body weight.

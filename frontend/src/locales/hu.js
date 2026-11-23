@@ -1,5 +1,9 @@
 // Hungarian UI strings. Keys are the English source strings (see lib/i18n.js).
 export default {
+  "Active calories from Apple Health": "Aktív kalóriák az Apple Healthből",
+  "Imports active calories when openGym opens or returns to the foreground. Don't log the same watch calories manually.": "Az aktív kalóriákat az openGym megnyitásakor vagy előtérbe kerülésekor importálja. Ugyanezeket az óra által mért kalóriákat ne rögzítsd kézzel.",
+  "Could not connect to Apple Health. Check Health permissions in the Health app.": "Nem sikerült kapcsolódni az Apple Healthhez. Ellenőrizd az engedélyeket az Egészség appban.",
+  "This website cannot read Apple Watch or Health data. Use the iPhone app and enable Apple Health to import daily active calories.": "Ez a webhely nem tudja olvasni az Apple Watch vagy az Egészség adatait. A napi aktív kalóriák importálásához engedélyezd az Apple Health szolgáltatást az iPhone-appban.",
   // --- Settings first screen in groups (#1105) ---
   "Watches": "Órák",
   "Set once": "Egyszer beállítandó",

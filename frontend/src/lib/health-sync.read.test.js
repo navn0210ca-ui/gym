@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 // object and an `apply` that runs the change on it (as useStore's update does).
 const h = vi.hoisted(() => {
   vi.stubEnv('VITE_MOBILE', '1')
-  return { files: new Map(), calls: [], platform: 'android', granted: { heartRate: true, weight: true }, hr: [], weights: [], fail: null }
+  return { files: new Map(), calls: [], platform: 'android', granted: { heartRate: true, weight: true, activeEnergy: true }, hr: [], weights: [], activeEnergy: [], fail: null }
 })
 
 vi.mock('@capacitor/filesystem', () => ({
@@ -48,6 +48,11 @@ vi.mock('@capacitor/core', () => ({
       if (h.fail) throw Object.assign(new Error('no'), { code: h.fail })
       return h.vitals || {}
     },
+    readActiveEnergy: async arg => {
+      h.calls.push(['readActiveEnergy', arg])
+      if (h.fail) throw Object.assign(new Error('no'), { code: h.fail })
+      return { records: h.activeEnergy.filter(r => r.d >= arg.from) }
+    },
     write: async () => { h.calls.push(['write']) },
     remove: async () => {},
     openSettings: async () => {},
@@ -71,7 +76,7 @@ beforeEach(async () => {
   vi.useFakeTimers({ toFake: ['Date'] })
   vi.setSystemTime(NOW)
   vi.resetModules()
-  h.files.clear(); h.calls = []; h.platform = 'android'; h.granted = { heartRate: true, weight: true }; h.hr = []; h.weights = []; h.fail = null
+  h.files.clear(); h.calls = []; h.platform = 'android'; h.granted = { heartRate: true, weight: true, activeEnergy: true }; h.hr = []; h.weights = []; h.activeEnergy = []; h.fail = null
   S = { unit: 'kg', workouts: [workout('w1')], bodyweight: [] }
   applied = 0
   hs = await import('./health-sync.js')
@@ -298,6 +303,48 @@ describe('vitals (v1.4.5)', () => {
     const off = await hs.disableRead('vitals')
     expect(off.readVitals).toBe(false)
     expect(off.vitals.days['2026-10-15'].steps).toBe(6400)
+  })
+
+  describe('Apple Watch active calories', () => {
+    it('asks for Apple Health Active Energy and imports daily totals into nutrition', async () => {
+      vi.resetModules()
+      h.platform = 'ios'
+      hs = await import('./health-sync.js')
+      h.activeEnergy = [{ d: '2026-10-15', kcal: 436 }, { d: '2026-10-14', kcal: 280 }]
+
+      const result = await hs.enableRead('calories', getState, { apply })
+
+      expect(result.ok).toBe(true)
+      expect(reads('request')[0][1]).toEqual({ read: ['activeEnergy'], write: [] })
+      expect(reads('readActiveEnergy')[0][1]).toEqual({ from: '2026-10-13' })
+      expect(S.nutritionEntries['apple-health-active-energy-2026-10-15']).toMatchObject({
+        type: 'activity', kcal: 436, source: 'apple-health',
+      })
+      expect(S.nutritionEntries['apple-health-active-energy-2026-10-14'].kcal).toBe(280)
+      expect(file().readCalories).toBe(true)
+    })
+
+    it('does not request Apple Health permissions on Android', async () => {
+      expect(await hs.enableRead('calories', getState, { apply })).toEqual({ ok: false, reason: 'unsupported' })
+      expect(reads('request')).toEqual([])
+    })
+
+    it('updates the same day when late Watch data arrives, then stops after disabling', async () => {
+      vi.resetModules()
+      h.platform = 'ios'
+      hs = await import('./health-sync.js')
+      h.activeEnergy = [{ d: '2026-10-15', kcal: 300 }]
+      await hs.enableRead('calories', getState, { apply })
+      h.activeEnergy = [{ d: '2026-10-15', kcal: 460 }]
+      await hs.readHealth(getState, { force: true, now: NOW + 3 * 60e3, apply })
+      expect(S.nutritionEntries['apple-health-active-energy-2026-10-15'].kcal).toBe(460)
+      expect(Object.keys(S.nutritionEntries)).toHaveLength(1)
+
+      await hs.disableRead('calories')
+      await hs.readHealth(getState, { force: true, now: NOW + 6 * 60e3, apply })
+      expect(reads('readActiveEnergy')).toHaveLength(2)
+      expect(S.nutritionEntries['apple-health-active-energy-2026-10-15'].kcal).toBe(460)
+    })
   })
   it('turns down when none of the four was allowed', async () => {
     h.granted = { heartRate: false, weight: false, vitals: false }
